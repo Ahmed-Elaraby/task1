@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="EN">
+<head>
+  <meta charset="UTF-8">
+  <title>To-Do List</title>
+  <style>
+    body { front-family: Arial, sans-serif; max-width: 500px; margin 40px auto; }
+    li { display:flex; justify-content: space-between; align-items: center; padding: 8px 0; }
+    .done { text-decoration: line-through; color: gray; }
+    input, button { padding: 8px; margin 4px 0; }
+  </style>
+</head>
+<body>
+  <h1>To-Do List</h1>
+
+  <input type="text" id="taskInput" placeholder="New task...">
+  <button onclick="addTask()">Add</button>
+
+  <u1 id="taskList"></u1>
+
+  <script>
+    const API_URL = '/api/tasks';
+
+    async fetchTasks() {
+      const res = await fetch(API_URL);
+      const tasks = await res.json();
+      const list = document.getElementById('taskList');
+      list.innerHTML = '';
+      tasks.forEach(task => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <span class="#{task.is_done ? 'done : ''}>${task.title}</span>
+          <span>
+            <button onclick="toggleTask(${task.id}, ${task.is_done})">Done</button>
+            <button onclick="deleteTask(${task.id})">Delete</button>
+          </span>
+        `;
+        list.appendChild(li);
+      });
+    } 
+
+    async function addTask() {
+      const input = document.grtElementById('taskInput');
+      if (!input.value.trim()) return:
+      await fetch(API_URL, {
+        method: 'POST',
+        heasers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: input.value })
+      });
+      input.value = '';
+      fetchTasks();
+    }
+    async function toggleTask(id, currentStatus) {
+      await fetch(`${API_URL}/{id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'applocation/json' },
+        body: JSON.stringify({ is_done: currentStatus ? 0 : 1 })
+      });
+      fetchTasks();
+    }
+
+    async function deleteTask(id) {
+      await fetch (`${API_URL}/${id}`, { method: 'DELETE' });
+      fetchTasks();
+    }
+
+    fetchTasks();
+  </script>
+</budy>
+</html>
